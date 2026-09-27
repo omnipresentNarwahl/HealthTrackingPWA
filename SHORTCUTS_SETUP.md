@@ -8,8 +8,7 @@ You'll do this **on the phone that should get the reminders** (his phone).
 
 ## One-time: install the app to the home screen first
 
-1. Open Safari and go to the app's URL (the one you get after deploying to
-   Vercel — see the main `README.md`).
+1. Open Safari and go to the app's URL: `https://health-tracking-pwa.vercel.app/`
 2. Tap the **Share** button (square with an arrow) at the bottom.
 3. Scroll down and tap **Add to Home Screen**.
 4. Tap **Add**. You now have an app icon that opens full-screen, no
@@ -29,9 +28,9 @@ times below — adjust to whatever fits his day.
    - Tap **Next**.
 5. Tap **Add Action**, search for **Open URL**, and add it.
 6. Tap the URL field and paste the app link with the right survey, e.g.:
-   - Morning: `https://YOUR-APP-URL.vercel.app/?survey=morning`
-   - Afternoon: `https://YOUR-APP-URL.vercel.app/?survey=afternoon`
-   - Evening: `https://YOUR-APP-URL.vercel.app/?survey=evening`
+   - Morning: `https://health-tracking-pwa.vercel.app/?survey=morning`
+   - Afternoon: `https://health-tracking-pwa.vercel.app/?survey=afternoon`
+   - Evening: `https://health-tracking-pwa.vercel.app/?survey=evening`
 7. Tap **Next**.
 8. **This is the important part**: on the "Ask Before Running" toggle,
    leave it **ON** (don't switch to "Run Immediately").
