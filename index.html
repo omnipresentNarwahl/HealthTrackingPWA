@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>Daily Tracker</title>
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Daily Tracker" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="app-header">
+      <h1 id="survey-title">Daily Tracker</h1>
+      <p id="survey-subtitle" class="subtitle"></p>
+    </header>
+
+    <main id="main" class="main"></main>
+  </div>
+
+  <template id="tpl-picker">
+    <div class="picker">
+      <p class="picker-intro">Pick a check-in to fill out:</p>
+      <button class="picker-btn" data-survey="morning">🌅 Morning</button>
+      <button class="picker-btn" data-survey="afternoon">☀️ Afternoon</button>
+      <button class="picker-btn" data-survey="evening">🌙 Evening</button>
+    </div>
+  </template>
+
+  <template id="tpl-scale">
+    <div class="field scale-field" data-field="">
+      <label class="field-label"></label>
+      <div class="scale-row"></div>
+    </div>
+  </template>
+
+  <template id="tpl-done">
+    <div class="done">
+      <div class="done-check">✓</div>
+      <p class="done-text">Thanks! Your answers were saved.</p>
+      <button class="done-btn" id="done-close">Close</button>
+    </div>
+  </template>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
