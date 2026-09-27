@@ -5,18 +5,13 @@
  */
 
 var SHEET_NAME = 'Responses';
-var COLUMNS = [
-  'timestamp',
-  'time_of_day',
-  'sleep',
-  'mood',
-  'physical',
-  'seizures_scale',
-  'seizures_note',
-  'activities',
-  'difficulty',
-  'free_text',
-];
+var ACTIVITY_KEYS = ['work', 'meeting', 'phone_call', 'social_event', 'exercise'];
+
+var COLUMNS = ['timestamp', 'time_of_day', 'sleep', 'mood', 'physical', 'seizures_scale', 'seizures_note']
+  .concat(ACTIVITY_KEYS.reduce(function (acc, key) {
+    return acc.concat([key + '_done', key + '_duration']);
+  }, []))
+  .concat(['difficulty', 'free_text']);
 
 function getOrCreateSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();

@@ -9,7 +9,13 @@
 
   const SEIZURE_OPTIONS = ["No", "Don't think so", "Maybe", "Probably", "Yes"];
 
-  const ACTIVITIES = ['Work', 'Meeting', 'Phone call', 'Social event', 'Exercise'];
+  const ACTIVITIES = [
+    { name: 'Work', key: 'work' },
+    { name: 'Meeting', key: 'meeting' },
+    { name: 'Phone call', key: 'phone_call' },
+    { name: 'Social event', key: 'social_event' },
+    { name: 'Exercise', key: 'exercise' },
+  ];
 
   const SURVEYS = {
     morning: {
@@ -213,7 +219,7 @@
 
     const state = {};
 
-    ACTIVITIES.forEach((name) => {
+    ACTIVITIES.forEach(({ name, key }) => {
       const row = el('div', 'activity-row');
 
       const checkbox = document.createElement('input');
@@ -232,15 +238,15 @@
         duration.disabled = !checkbox.checked;
         row.classList.toggle('selected', checkbox.checked);
         if (checkbox.checked) {
-          state[name] = duration.value.trim();
+          state[key] = duration.value.trim();
         } else {
-          delete state[name];
+          delete state[key];
           duration.value = '';
         }
       });
 
       duration.addEventListener('input', () => {
-        if (checkbox.checked) state[name] = duration.value.trim();
+        if (checkbox.checked) state[key] = duration.value.trim();
       });
 
       row.appendChild(checkbox);
@@ -251,7 +257,15 @@
 
     return {
       node: wrap,
-      getValue: () => ({ [field.key]: { ...state } }),
+      getValue: () => {
+        const out = {};
+        ACTIVITIES.forEach(({ key }) => {
+          const checked = key in state;
+          out[`${key}_done`] = checked ? 'Yes' : '';
+          out[`${key}_duration`] = checked ? state[key] : '';
+        });
+        return out;
+      },
     };
   }
 
@@ -279,10 +293,13 @@
       physical: '',
       seizures_scale: '',
       seizures_note: '',
-      activities: '',
       difficulty: '',
       free_text: '',
     };
+    ACTIVITIES.forEach(({ key }) => {
+      payload[`${key}_done`] = '';
+      payload[`${key}_duration`] = '';
+    });
 
     fieldRefs.forEach(({ field, getValue }) => {
       const value = getValue();
@@ -291,7 +308,7 @@
       } else if (field.type === 'choice') {
         Object.assign(payload, value);
       } else if (field.type === 'activities') {
-        payload.activities = JSON.stringify(value[field.key]);
+        Object.assign(payload, value);
       } else if (field.type === 'text') {
         payload[field.key] = value;
       }
