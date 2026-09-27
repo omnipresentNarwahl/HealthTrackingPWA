@@ -9,7 +9,7 @@
 
   const SEIZURE_OPTIONS = ["No", "Don't think so", "Maybe", "Probably", "Yes"];
 
-  const ACTIVITIES = ['Work', 'Meeting', 'Phone call', 'Social event'];
+  const ACTIVITIES = ['Work', 'Meeting', 'Phone call', 'Social event', 'Exercise'];
 
   const SURVEYS = {
     morning: {
@@ -100,9 +100,9 @@
     const fieldRefs = [];
 
     survey.fields.forEach((field) => {
-      const { node, getValue, isComplete } = buildField(field, answers);
+      const { node, getValue } = buildField(field, answers);
       card.appendChild(node);
-      fieldRefs.push({ field, getValue, isComplete });
+      fieldRefs.push({ field, getValue });
     });
 
     const errorMsg = el('p', 'error-msg');
@@ -110,12 +110,6 @@
 
     const submitBtn = el('button', 'submit-btn', 'Submit');
     submitBtn.addEventListener('click', async () => {
-      const missing = fieldRefs.filter((f) => !f.isComplete());
-      if (missing.length) {
-        errorMsg.textContent = 'Please answer every question before submitting.';
-        errorMsg.style.display = 'block';
-        return;
-      }
       errorMsg.style.display = 'none';
       submitBtn.disabled = true;
       submitBtn.textContent = 'Saving...';
@@ -174,7 +168,6 @@
     return {
       node: wrap,
       getValue: () => selected,
-      isComplete: () => selected !== null,
     };
   }
 
@@ -207,7 +200,6 @@
     return {
       node: wrap,
       getValue: () => ({ [field.key]: selected, [field.noteKey]: noteInput ? noteInput.value.trim() : '' }),
-      isComplete: () => selected !== null,
     };
   }
 
@@ -233,7 +225,7 @@
       const duration = document.createElement('input');
       duration.type = 'text';
       duration.className = 'activity-duration';
-      duration.placeholder = 'e.g. 30 min';
+      duration.placeholder = 'Duration in hours';
       duration.disabled = true;
 
       checkbox.addEventListener('change', () => {
@@ -260,8 +252,6 @@
     return {
       node: wrap,
       getValue: () => ({ [field.key]: { ...state } }),
-      // Activities are optional — it's fine if he did nothing notable.
-      isComplete: () => true,
     };
   }
 
@@ -276,7 +266,6 @@
     return {
       node: wrap,
       getValue: () => textarea.value.trim(),
-      isComplete: () => true,
     };
   }
 
