@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-tracker-v1';
+const CACHE_NAME = 'daily-tracker-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -34,16 +34,18 @@ self.addEventListener('fetch', (event) => {
   // Never cache the data submission requests.
   if (request.method !== 'GET') return;
 
+  // Network-first: always try to get the latest app code/data when online,
+  // and only fall back to the cached copy if the network is unavailable.
+  // (Cache-first would keep serving stale JS/HTML indefinitely after a
+  // deploy, since the service worker only re-installs when sw.js itself
+  // changes.)
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(() => cached);
-    })
+    fetch(request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        return response;
+      })
+      .catch(() => caches.match(request))
   );
 });
