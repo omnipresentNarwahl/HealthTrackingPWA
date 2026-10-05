@@ -4,6 +4,7 @@
   const $main = document.getElementById('main');
   const $title = document.getElementById('survey-title');
   const $subtitle = document.getElementById('survey-subtitle');
+  const $lastFilled = document.getElementById('last-filled');
 
   const SCALE_LABELS = ['1', '2', '3', '4', '5'];
 
@@ -89,12 +90,60 @@
   }
 
   function render() {
+    renderLastFilledNote();
     const surveyKey = getSurveyKeyFromUrl();
     if (!surveyKey) {
       renderPicker();
     } else {
       renderSurvey(surveyKey);
     }
+  }
+
+  // ---- "Last filled out" note (shown on every page) ----
+
+  const LAST_FILLED_KEY = 'tracker_last_filled';
+
+  function getLastFilled() {
+    try {
+      return JSON.parse(localStorage.getItem(LAST_FILLED_KEY) || 'null');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setLastFilled(surveyKey, isoTimestamp) {
+    try {
+      localStorage.setItem(LAST_FILLED_KEY, JSON.stringify({ survey: surveyKey, timestamp: isoTimestamp }));
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
+
+  function surveyDisplayName(surveyKey) {
+    return surveyKey.charAt(0).toUpperCase() + surveyKey.slice(1);
+  }
+
+  function formatRelativeTime(isoTimestamp) {
+    const date = new Date(isoTimestamp);
+    const now = new Date();
+    const timeStr = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+
+    if (date.toDateString() === now.toDateString()) return `today at ${timeStr}`;
+    if (date.toDateString() === yesterday.toDateString()) return `yesterday at ${timeStr}`;
+    const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return `on ${dateStr} at ${timeStr}`;
+  }
+
+  function renderLastFilledNote() {
+    const last = getLastFilled();
+    if (!last) {
+      $lastFilled.textContent = 'No check-ins filled out yet on this phone.';
+      return;
+    }
+    $lastFilled.textContent = `${surveyDisplayName(last.survey)} survey was last filled out ${formatRelativeTime(last.timestamp)}.`;
   }
 
   function renderPicker() {
@@ -142,6 +191,8 @@
       const ok = await submitPayload(payload);
 
       if (ok) {
+        setLastFilled(surveyKey, payload.timestamp);
+        renderLastFilledNote();
         showDone();
       } else {
         submitBtn.disabled = false;

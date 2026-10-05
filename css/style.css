@@ -45,6 +45,12 @@ html, body {
   font-size: 14px;
 }
 
+.last-filled {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .main {
   padding: 8px 16px 24px;
 }
