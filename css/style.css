@@ -108,6 +108,12 @@ html, body {
   margin-bottom: 10px;
 }
 
+.field-tag {
+  font-weight: 800;
+  color: var(--blue);
+  letter-spacing: 0.02em;
+}
+
 .field-hint {
   display: block;
   font-weight: 400;

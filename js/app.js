@@ -23,9 +23,10 @@
       title: 'Morning Check-in',
       subtitle: 'A quick question about last night',
       fields: [
-        { type: 'scale', key: 'sleep', label: 'How was your sleep quality?', low: 'Poor', high: 'Great' },
-        { type: 'scale', key: 'mood', label: 'How was your mood last night?', low: 'Low', high: 'Great' },
-        { type: 'scale', key: 'physical', label: 'How did you feel physically last night?', low: 'Poor', high: 'Great' },
+        { type: 'scale', key: 'sleep', tag: 'SLEEP', label: 'How was your sleep quality?', low: 'Poor', high: 'Great' },
+        { type: 'scale', key: 'mood', tag: 'MOOD', label: 'How is your mood?', low: 'Low', high: 'Great' },
+        { type: 'scale', key: 'physical', tag: 'PHYSICALLY', label: 'How did you feel physically last night?', low: 'Poor', high: 'Great' },
+        ictalSeverityField(),
         {
           type: 'choice',
           key: 'seizures_scale',
@@ -34,7 +35,6 @@
           noteKey: 'seizures_note',
           notePlaceholder: 'Anything you want to add (optional)',
         },
-        ictalSeverityField('last night'),
         { type: 'text', key: 'free_text', label: 'Anything else to note?', placeholder: 'Optional' },
       ],
     },
@@ -52,15 +52,16 @@
     },
   };
 
-  function ictalSeverityField(phrase) {
-    return { type: 'scale', key: 'ictal_severity', label: `Rate seizure/ictal severity ${phrase}`, low: 'None', high: 'Severe' };
+  function ictalSeverityField() {
+    return { type: 'scale', key: 'ictal_severity', tag: 'ICTAL', label: 'How ictal do you feel?', low: 'None', high: 'Severe' };
   }
 
   function afternoonEveningFields(periodWord) {
     const phrase = `this ${periodWord}`;
     return [
-      { type: 'scale', key: 'mood', label: `How was your mood ${phrase}?`, low: 'Low', high: 'Great' },
-      { type: 'scale', key: 'physical', label: `How did you feel physically ${phrase}?`, low: 'Poor', high: 'Great' },
+      { type: 'scale', key: 'mood', tag: 'MOOD', label: 'How is your mood?', low: 'Low', high: 'Great' },
+      { type: 'scale', key: 'physical', tag: 'PHYSICALLY', label: `How did you feel physically ${phrase}?`, low: 'Poor', high: 'Great' },
+      ictalSeverityField(),
       {
         type: 'choice',
         key: 'seizures_scale',
@@ -69,7 +70,6 @@
         noteKey: 'seizures_note',
         notePlaceholder: 'Anything you want to add (optional)',
       },
-      ictalSeverityField(phrase),
       { type: 'activities', key: 'activities', label: `What did you do ${phrase}?`, hint: 'Select all that apply and how long' },
       { type: 'scale', key: 'difficulty', label: `How hard was ${phrase}?`, low: 'Easy', high: 'Very hard' },
       { type: 'text', key: 'free_text', label: 'Anything else to note?', placeholder: 'Optional' },
@@ -217,7 +217,14 @@
 
   function buildScaleField(field, answers) {
     const wrap = el('div', 'field');
-    wrap.appendChild(el('label', 'field-label', field.label));
+    const labelEl = el('label', 'field-label');
+    if (field.tag) {
+      labelEl.appendChild(el('span', 'field-tag', field.tag));
+      labelEl.appendChild(document.createTextNode(' ' + field.label));
+    } else {
+      labelEl.textContent = field.label;
+    }
+    wrap.appendChild(labelEl);
 
     const row = el('div', 'scale-row');
     let selected = null;
