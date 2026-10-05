@@ -4,10 +4,14 @@
  * Script), then deploy as a Web App (see apps-script/README.md).
  */
 
-var SHEET_NAME = 'Responses';
+// New tab (not the original "Responses" tab) so this schema's header row
+// doesn't collide with the old one — the old tab is left as-is, read-only
+// history. Bump this name again if the schema changes in a future
+// incompatible way.
+var SHEET_NAME = 'Responses_v2';
 var ACTIVITY_KEYS = ['work', 'meeting', 'phone_call', 'social_event', 'exercise'];
 
-var COLUMNS = ['timestamp', 'time_of_day', 'sleep', 'mood', 'physical', 'seizures_scale', 'seizures_note']
+var COLUMNS = ['timestamp', 'time_of_day', 'device_id', 'device_hint', 'sleep', 'mood', 'physical', 'seizures_scale', 'seizures_note', 'ictal_severity']
   .concat(ACTIVITY_KEYS.reduce(function (acc, key) {
     return acc.concat([key + '_done', key + '_duration']);
   }, []))

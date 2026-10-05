@@ -8,7 +8,7 @@ response, and a small Apps Script Web App that the PWA calls to append rows.
 1. Go to [sheets.google.com](https://sheets.google.com) and create a new
    blank spreadsheet. Name it something like **Dad's Daily Tracker**.
 2. You don't need to create any tabs or headers by hand — the script below
-   creates a `Responses` tab and header row automatically on first submit.
+   creates a `Responses_v2` tab and header row automatically on first submit.
 
 ## 2. Add the script
 
@@ -47,8 +47,19 @@ response, and a small Apps Script Web App that the PWA calls to append rows.
 ## 5. Test it
 
 Open the app, fill out any survey, and hit Submit. Within a couple of
-seconds you should see a new `Responses` tab appear in the Sheet with a
+seconds you should see a new `Responses_v2` tab appear in the Sheet with a
 header row and your test row underneath.
+
+## Note on the `Responses` vs `Responses_v2` tabs
+
+The schema grew (new seizure/ictal rating, per-activity columns, device
+info, expanded morning survey) in a way that doesn't fit the original
+`Responses` tab's header row. Rather than rewrite history, new submissions
+go to a new `Responses_v2` tab with the new header, and the original
+`Responses` tab is left untouched as read-only history from before the
+change. If you want everything in one place for analysis, copy/paste the
+old rows into `Responses_v2` manually and leave the new columns blank for
+them — there's no automatic migration.
 
 ## Updating the script later
 

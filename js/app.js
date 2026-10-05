@@ -23,6 +23,18 @@
       subtitle: 'A quick question about last night',
       fields: [
         { type: 'scale', key: 'sleep', label: 'How was your sleep quality?', low: 'Poor', high: 'Great' },
+        { type: 'scale', key: 'mood', label: 'How was your mood last night?', low: 'Low', high: 'Great' },
+        { type: 'scale', key: 'physical', label: 'How did you feel physically last night?', low: 'Poor', high: 'Great' },
+        {
+          type: 'choice',
+          key: 'seizures_scale',
+          label: 'Any seizure activity last night?',
+          options: SEIZURE_OPTIONS,
+          noteKey: 'seizures_note',
+          notePlaceholder: 'Anything you want to add (optional)',
+        },
+        ictalSeverityField('last night'),
+        { type: 'text', key: 'free_text', label: 'Anything else to note?', placeholder: 'Optional' },
       ],
     },
     afternoon: {
@@ -39,10 +51,15 @@
     },
   };
 
+  function ictalSeverityField(phrase) {
+    return { type: 'scale', key: 'ictal_severity', label: `Rate seizure/ictal severity ${phrase}`, low: 'None', high: 'Severe' };
+  }
+
   function afternoonEveningFields(periodWord) {
+    const phrase = `this ${periodWord}`;
     return [
-      { type: 'scale', key: 'mood', label: `How was your mood this ${periodWord}?`, low: 'Low', high: 'Great' },
-      { type: 'scale', key: 'physical', label: `How did you feel physically this ${periodWord}?`, low: 'Poor', high: 'Great' },
+      { type: 'scale', key: 'mood', label: `How was your mood ${phrase}?`, low: 'Low', high: 'Great' },
+      { type: 'scale', key: 'physical', label: `How did you feel physically ${phrase}?`, low: 'Poor', high: 'Great' },
       {
         type: 'choice',
         key: 'seizures_scale',
@@ -51,8 +68,9 @@
         noteKey: 'seizures_note',
         notePlaceholder: 'Anything you want to add (optional)',
       },
-      { type: 'activities', key: 'activities', label: `What did you do this ${periodWord}?`, hint: 'Select all that apply and how long' },
-      { type: 'scale', key: 'difficulty', label: `How hard was this ${periodWord}?`, low: 'Easy', high: 'Very hard' },
+      ictalSeverityField(phrase),
+      { type: 'activities', key: 'activities', label: `What did you do ${phrase}?`, hint: 'Select all that apply and how long' },
+      { type: 'scale', key: 'difficulty', label: `How hard was ${phrase}?`, low: 'Easy', high: 'Very hard' },
       { type: 'text', key: 'free_text', label: 'Anything else to note?', placeholder: 'Optional' },
     ];
   }
@@ -288,11 +306,14 @@
     const payload = {
       timestamp: now.toISOString(),
       time_of_day: surveyKey,
+      device_id: getDeviceId(),
+      device_hint: getDeviceHint(),
       sleep: '',
       mood: '',
       physical: '',
       seizures_scale: '',
       seizures_note: '',
+      ictal_severity: '',
       difficulty: '',
       free_text: '',
     };
@@ -327,6 +348,41 @@
     document.getElementById('done-close').addEventListener('click', () => {
       window.location.search = '';
     });
+  }
+
+  // ---- Device fingerprint (not auth — just makes a stray submission from
+  // someone else's browser visually stand out in the sheet) ----
+
+  const DEVICE_ID_KEY = 'tracker_device_id';
+
+  function getDeviceId() {
+    try {
+      let id = localStorage.getItem(DEVICE_ID_KEY);
+      if (!id) {
+        id = Math.random().toString(36).slice(2, 10);
+        localStorage.setItem(DEVICE_ID_KEY, id);
+      }
+      return id;
+    } catch (e) {
+      return 'unknown';
+    }
+  }
+
+  function getDeviceHint() {
+    const ua = navigator.userAgent || '';
+    let platform = 'Unknown device';
+    if (/iPad/.test(ua)) platform = 'iPad';
+    else if (/iPhone/.test(ua)) platform = 'iPhone';
+    else if (/Android/.test(ua)) platform = 'Android';
+    else if (/Macintosh/.test(ua)) platform = 'Mac';
+    else if (/Windows/.test(ua)) platform = 'Windows';
+
+    let browser = 'Unknown browser';
+    if (/CriOS|Chrome/.test(ua)) browser = 'Chrome';
+    else if (/Safari/.test(ua)) browser = 'Safari';
+    else if (/Firefox/.test(ua)) browser = 'Firefox';
+
+    return `${platform} / ${browser}`;
   }
 
   // ---- Submission + offline retry queue ----
